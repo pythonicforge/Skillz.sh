@@ -67,6 +67,9 @@ class Skillz(cmd.Cmd):
             self.print(f"[ERROR] {e}\n", "red")
 
     def do_delete(self, arg: str) -> None:
+        """
+        Deletes a programming language from the skills database, handling errors and providing feedback.
+        """
         try:
             language = arg.capitalize()
             self.cursor.execute("DELETE FROM skills WHERE language = ?", (language,))
@@ -78,6 +81,7 @@ class Skillz(cmd.Cmd):
             self.print(f"[ERROR] {e}\n", "red")
 
     def do_deleteall(self, arg: str) -> None:
+        """Deletes all records from the skills table."""
         try:
             self.cursor.execute("DELETE FROM skills")
             self.conn.commit()
@@ -85,6 +89,8 @@ class Skillz(cmd.Cmd):
         except Exception as e:
             self.print(f"[ERROR] {e}\n", "red")
 
+    def do_clear(self, arg:str) -> None:
+        os.system('clear')
 
     def do_bye(self, arg:str) -> None:
         """Exits the program."""
@@ -96,10 +102,10 @@ class Skillz(cmd.Cmd):
         builtins.print(colored(text, color))
 
     def bar(self, value: int, maxVal: int = 100, barLength: int = 20) -> str:
+        """Generates a bar for the skill level of the languages"""
         filledLength = int((value / maxVal) * barLength)
         bar = "█" * filledLength + "-" * (barLength - filledLength)
         return f"{bar} |"
-
 
 if __name__ == '__main__':
     try:
