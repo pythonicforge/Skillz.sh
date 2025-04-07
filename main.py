@@ -1,6 +1,7 @@
 import os
 import sys
 import cmd
+import sqlite3
 import builtins
 from termcolor import colored
 from typing import Optional, Literal
@@ -12,25 +13,55 @@ class Skillz(cmd.Cmd):
 
     def __init__(self, completekey = "tab", stdin = None, stdout = None):
         super().__init__(completekey, stdin, stdout) 
+        self.conn = sqlite3.connect('skillz.db')
+        self.cursor = self.conn.cursor()
+        self.setup_db()
+
+    def setup_db(self):
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS skills (
+                language TEXT PRIMARY KEY,
+                skill_level INTEGER
+            )
+        ''')
+        self.conn.commit()
 
     def do_show(self, arg:str) -> None:
         """Shows the skill chart."""
+        self.cursor.execute("SELECT * FROM skills")
+        rows = self.cursor.fetchall()
         self.print("DASHBOARD\n", "light_blue")
+        for lang, skill in rows:
+            self.print(f"{lang:<15} | {skill}/100", "white")
 
     def do_add(self, arg:str) -> None:
         """Add a new language and it's respective skill level: add <lang> <skill-level>"""
         try:
             language, skillLevel = arg.split()
-            self.print(f'[INFO] {language} added at a skill level of {skillLevel}\n',"light_green")
-        except ValueError as e:
+            skillLevel = int(skillLevel)
+            if not (0 <= skillLevel <= 100):
+                raise ValueError("Skill level should be between 0 and 100.")
+            self.cursor.execute("INSERT INTO skills (language, skill_level) VALUES (?, ?)", (language, skillLevel))
+            self.conn.commit()
+            self.print(f"[INFO] {language} added at skill level {skillLevel}\n", "light_green")
+        except sqlite3.IntegrityError:
+            self.print(f"[ERROR] {language} already exists. Use `update` to modify.\n", "red")
+        except Exception as e:
             self.print(f"[ERROR] {e}\n", "red")
 
     def do_update(self, arg:str) -> None:
         """Update an existing and it's respective skill level: update <lang> <skill-level>"""
         try:
             language, skillLevel = arg.split()
-            self.print(f'[INFO] {language} updated at a skill level of {skillLevel}\n',"light_green")
-        except ValueError as e:
+            skillLevel = int(skillLevel)
+            if not (0 <= skillLevel <= 100):
+                raise ValueError("Skill level should be between 0 and 100.")
+            self.cursor.execute("UPDATE skills SET skill_level = ? WHERE language = ?", (skillLevel, language))
+            if self.cursor.rowcount == 0:
+                raise ValueError(f"{language} doesn't exist. Use `add` instead.")
+            self.conn.commit()
+            self.print(f"[INFO] {language} updated to {skillLevel}\n", "light_green")
+        except Exception as e:
             self.print(f"[ERROR] {e}\n", "red")
 
     def do_bye(self, arg:str) -> None:
