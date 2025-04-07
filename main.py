@@ -32,7 +32,7 @@ class Skillz(cmd.Cmd):
         rows = self.cursor.fetchall()
         self.print("DASHBOARD\n", "light_blue")
         for lang, skill in rows:
-            self.print(f"{lang:<15} | {self.bar(skill)} \t {skill}/100", "white")
+            self.print(f"{lang:<15} | {self.bar(skill)} \t {skill}%", "white")
 
     def do_add(self, arg:str) -> None:
         """Add a new language and it's respective skill level: add <lang> <skill-level>"""
