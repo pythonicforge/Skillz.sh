@@ -16,7 +16,7 @@ Skillz is a command-line application to manage and track your programming skills
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/pythonicforge/Skillz.sh.git
    cd Skillz.sh
    ```
 
