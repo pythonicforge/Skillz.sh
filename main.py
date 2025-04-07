@@ -86,7 +86,6 @@ class Skillz(cmd.Cmd):
             self.print(f"[ERROR] {e}\n", "red")
 
 
-
     def do_bye(self, arg:str) -> None:
         """Exits the program."""
         self.print(f'Bye 👋\n',"light_cyan")
