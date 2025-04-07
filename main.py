@@ -104,7 +104,7 @@ class Skillz(cmd.Cmd):
     def bar(self, value: int, maxVal: int = 100, barLength: int = 20) -> str:
         """Generates a bar for the skill level of the languages"""
         filledLength = int((value / maxVal) * barLength)
-        bar = "█" * filledLength + "-" * (barLength - filledLength)
+        bar = "█" * filledLength + "░" * (barLength - filledLength)
         return f"{bar} |"
 
 if __name__ == '__main__':
