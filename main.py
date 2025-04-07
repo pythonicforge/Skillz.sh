@@ -66,6 +66,27 @@ class Skillz(cmd.Cmd):
         except Exception as e:
             self.print(f"[ERROR] {e}\n", "red")
 
+    def do_delete(self, arg: str) -> None:
+        try:
+            language = arg.capitalize()
+            self.cursor.execute("DELETE FROM skills WHERE language = ?", (language,))
+            self.conn.commit()
+            if self.cursor.rowcount == 0:
+                raise ValueError(f"{language} doesn't exist. Use `add` instead.")
+            self.print(f"[INFO] {language} deleted\n", "light_green")
+        except Exception as e:
+            self.print(f"[ERROR] {e}\n", "red")
+
+    def do_deleteall(self, arg: str) -> None:
+        try:
+            self.cursor.execute("DELETE FROM skills")
+            self.conn.commit()
+            self.print(f"[INFO] All data cleared.\n", "light_green")
+        except Exception as e:
+            self.print(f"[ERROR] {e}\n", "red")
+
+
+
     def do_bye(self, arg:str) -> None:
         """Exits the program."""
         self.print(f'Bye 👋\n',"light_cyan")
