@@ -9,7 +9,7 @@ from typing import Optional, Literal
 class Skillz(cmd.Cmd):
     os.system('clear')
     intro = "Welcome to Skillz! Type 'help' to list commands."
-    prompt = "(sh) "
+    prompt = "\n\n(sh) "
 
     def __init__(self, completekey = "tab", stdin = None, stdout = None):
         super().__init__(completekey, stdin, stdout) 
@@ -32,13 +32,14 @@ class Skillz(cmd.Cmd):
         rows = self.cursor.fetchall()
         self.print("DASHBOARD\n", "light_blue")
         for lang, skill in rows:
-            self.print(f"{lang:<15} | {skill}/100", "white")
+            self.print(f"{lang:<15} | {self.bar(skill)} \t {skill}/100", "white")
 
     def do_add(self, arg:str) -> None:
         """Add a new language and it's respective skill level: add <lang> <skill-level>"""
         try:
             language, skillLevel = arg.split()
             skillLevel = int(skillLevel)
+            language = language.capitalize()
             if not (0 <= skillLevel <= 100):
                 raise ValueError("Skill level should be between 0 and 100.")
             self.cursor.execute("INSERT INTO skills (language, skill_level) VALUES (?, ?)", (language, skillLevel))
@@ -54,6 +55,7 @@ class Skillz(cmd.Cmd):
         try:
             language, skillLevel = arg.split()
             skillLevel = int(skillLevel)
+            language = language.capitalize()
             if not (0 <= skillLevel <= 100):
                 raise ValueError("Skill level should be between 0 and 100.")
             self.cursor.execute("UPDATE skills SET skill_level = ? WHERE language = ?", (skillLevel, language))
@@ -72,6 +74,12 @@ class Skillz(cmd.Cmd):
     def print(self, text:str, color:Optional[Literal['black', 'grey', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'light_grey', 'dark_grey', 'light_red', 'light_green', 'light_yellow', 'light_blue', 'light_magenta', 'light_cyan', 'white']]) -> None:
         """Modified print function that prints text with colors"""
         builtins.print(colored(text, color))
+
+    def bar(self, value: int, maxVal: int = 100, barLength: int = 20) -> str:
+        filledLength = int((value / maxVal) * barLength)
+        bar = "█" * filledLength + "-" * (barLength - filledLength)
+        return f"{bar} |"
+
 
 if __name__ == '__main__':
     try:
